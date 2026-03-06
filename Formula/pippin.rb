@@ -2,8 +2,8 @@ class Pippin < Formula
   desc "macOS CLI toolkit for Apple app automation"
   homepage "https://github.com/mattwag05/pippin"
   url "https://github.com/mattwag05/pippin.git",
-      tag:      "v0.1.4-beta",
-      revision: "1b341fce6b01807d9a82f45149d8f5eb6d926fe9"
+      tag:      "v0.1.0",
+      revision: "1d5bffd08def344d271d9abc0a3cb922b77ebd87"
   license "Apache-2.0"
   head "https://github.com/mattwag05/pippin.git", branch: "main"
 
@@ -19,6 +19,6 @@ class Pippin < Formula
   end
 
   test do
-    assert_match "0.1.4-beta", shell_output("#{bin}/pippin --version")
+    assert_match "0.1.0", shell_output("#{bin}/pippin --version")
   end
 end
