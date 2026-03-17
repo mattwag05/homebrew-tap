@@ -3,7 +3,7 @@ class Pippin < Formula
   homepage "https://github.com/mattwag05/pippin"
   url "https://github.com/mattwag05/pippin.git",
       tag:      "v0.13.0",
-      revision: "fd12469c6316b46064e58e731fb99e964ba4dadb"
+      revision: "44d720683d55328cefa7dac8660db271690da2a4"
   license "Apache-2.0"
   head "https://github.com/mattwag05/pippin.git", branch: "main"
 
