@@ -1,12 +1,16 @@
 class RagQuest < Formula
   desc "AI-powered D&D-style text RPG with LightRAG knowledge graph backend"
   homepage "https://github.com/mattwag05/rag-quest"
-  url "https://github.com/mattwag05/rag-quest/archive/refs/tags/v0.2.0.tar.gz"
-  sha256 "283eb6583eaa122f4d80658ab2b7fa48e79124d678f14d2ee0728ee89729a864"
+  url "https://github.com/mattwag05/rag-quest/archive/refs/tags/v0.3.0.tar.gz"
+  sha256 "55343729d1a3e92505370f58ddb9d4e4aa8e799758627dd6502eec4a5decb18a"
   license "MIT"
-  version "0.2.0"
+  version "0.3.0"
 
   depends_on "python@3.11"
+  
+  on_macos do
+    depends_on "portaudio"  # For pyttsx3 TTS support
+  end
 
   def install
     # Use Python 3.11
