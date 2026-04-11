@@ -1,10 +1,10 @@
 class RagQuest < Formula
   desc "AI-powered D&D-style text RPG with LightRAG knowledge graph backend"
   homepage "https://github.com/mattwag05/rag-quest"
-  url "https://github.com/mattwag05/rag-quest/archive/9cecb53a0c23286c69049df878ef3ce8ba7505ff.tar.gz"
-  sha256 :no_check  # Check this after update
+  url "https://github.com/mattwag05/rag-quest/archive/refs/tags/v0.2.0.tar.gz"
+  sha256 "283eb6583eaa122f4d80658ab2b7fa48e79124d678f14d2ee0728ee89729a864"
   license "MIT"
-  version "0.1.0"
+  version "0.2.0"
 
   depends_on "python@3.11"
 
