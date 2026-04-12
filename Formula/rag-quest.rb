@@ -1,28 +1,26 @@
 class RagQuest < Formula
   desc "AI-powered D&D-style text RPG with LightRAG knowledge graph backend"
   homepage "https://github.com/mattwag05/rag-quest"
-  url "https://github.com/mattwag05/rag-quest/archive/refs/tags/v0.5.3.tar.gz"
-  sha256 "7785993caebf1c80b2bf13ecdf43fadde517a3d0a1155d83f1bb8f91841d1f6e"
+  url "https://github.com/mattwag05/rag-quest/archive/refs/tags/v0.5.4.tar.gz"
+  sha256 "f6ef6f86ac90a911b26a498a5c09a4c8ff88a24dcebbdf396499695d8239cfe0"
   license "MIT"
-  version "0.5.3"
+  version "0.5.4"
 
   depends_on "python@3.11"
-  
+
   on_macos do
-    depends_on "portaudio"  # For pyttsx3 TTS support
+    depends_on "portaudio" # For pyttsx3 TTS support
   end
 
   def install
-    # Use Python 3.11
     python = Formula["python@3.11"].opt_bin/"python3.11"
-    system python, "-m", "pip", "install", "--upgrade", "pip"
-    system python, "-m", "pip", "install", "--no-cache-dir", "."
-    
-    # Create a wrapper script for the rag-quest command
-    (bin/"rag-quest").write_env_script(
-      python,
-      "-m rag_quest"
-    )
+
+    # Create isolated venv in libexec so dependencies don't pollute system Python
+    system python, "-m", "venv", libexec
+    system libexec/"bin/pip", "install", "--no-cache-dir", "."
+
+    # The package defines a console_script entry point "rag-quest" — link it
+    bin.install_symlink libexec/"bin/rag-quest"
   end
 
   test do
