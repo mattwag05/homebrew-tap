@@ -2,10 +2,13 @@ class Pippin < Formula
   desc "macOS CLI toolkit for Apple app automation"
   homepage "https://github.com/mattwag05/pippin"
   url "https://github.com/mattwag05/pippin.git",
-      tag:      "v0.17.0",
-      revision: "0f4ab95d31a36b97bc7b6f1103d85d4f16c3a6bd"
+      tag:      "v0.18.0",
+      revision: "eb99fd84f9d4285afc808eb89478505fcd876b46"
   license "Apache-2.0"
   head "https://github.com/mattwag05/pippin.git", branch: "main"
+
+  # Pinned alongside AudioBridge.pinnedMLXAudioVersion — keep in sync.
+  MLX_AUDIO_PINNED = "0.4.2"
 
   depends_on xcode: ["16.0", :build]
   depends_on :macos
@@ -18,7 +21,19 @@ class Pippin < Formula
     bin.install buildpath/".build/release/pippin"
   end
 
+  def post_install
+    pipx = which("pipx")
+    if pipx.nil?
+      ohai "pipx not found — skipping mlx-audio install."
+      ohai "For `pippin memos transcribe`, run:"
+      ohai "  brew install pipx && pipx install 'mlx-audio==#{MLX_AUDIO_PINNED}'"
+      return
+    end
+    # --force keeps reinstalls idempotent across pippin upgrades.
+    system pipx, "install", "--force", "mlx-audio==#{MLX_AUDIO_PINNED}"
+  end
+
   test do
-    assert_match "0.17.0", shell_output("#{bin}/pippin --version")
+    assert_match "0.18.0", shell_output("#{bin}/pippin --version")
   end
 end
