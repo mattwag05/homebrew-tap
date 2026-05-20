@@ -2,8 +2,8 @@ class Pippin < Formula
   desc "macOS CLI toolkit for Apple app automation"
   homepage "https://github.com/mattwag05/pippin"
   url "https://github.com/mattwag05/pippin.git",
-      tag:      "v0.20.2",
-      revision: "92f9880ec47e7e12d348878cb4b292ddbf4947f0"
+      tag:      "v0.23.0",
+      revision: "6d623cf2948618f0bc52ba2ca9ba27d2fa6c27d1"
   license "Apache-2.0"
   head "https://github.com/mattwag05/pippin.git", branch: "main"
 
@@ -25,7 +25,7 @@ class Pippin < Formula
     pipx = which("pipx")
     if pipx.nil?
       ohai "pipx not found — skipping mlx-audio install."
-      ohai "For `pippin memos transcribe`, run:"
+      ohai "For \`pippin memos transcribe\`, run:"
       ohai "  brew install pipx && pipx install 'mlx-audio==#{MLX_AUDIO_PINNED}'"
       return
     end
@@ -34,6 +34,6 @@ class Pippin < Formula
   end
 
   test do
-    assert_match "0.20.2", shell_output("#{bin}/pippin --version")
+    assert_match "0.23.0", shell_output("#{bin}/pippin --version")
   end
 end
