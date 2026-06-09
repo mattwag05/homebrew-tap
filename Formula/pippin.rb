@@ -18,12 +18,14 @@ class Pippin < Formula
            "--disable-sandbox",
            "-c", "release",
            "--scratch-path", buildpath/".build"
-    # Sign with a stable identity so macOS TCC permission grants persist across
-    # `brew upgrade` (SwiftPM ad-hoc signs → CDHash-based identity → grants reset
-    # every rebuild). Guarded twice: the `File.exist?` skips tags older than the
-    # script, and scripts/sign.sh itself no-ops with an ad-hoc fallback when no
-    # Developer ID identity is in the keychain — so installs of any tag and on
-    # any machine still succeed. See docs/gotchas/permissions.md (pippin-xzu).
+    # Best-effort stable-identity signing so macOS TCC grants persist. NOTE:
+    # Homebrew's build sandbox has no login-keychain access, so sign.sh usually
+    # finds no Developer ID identity and falls back to ad-hoc here — brew-built
+    # pippin is typically ad-hoc, and `~/.local/bin/pippin` (from `make install`)
+    # is the signed path that shadows it on PATH. Re-sign the brew copy with
+    # `bash scripts/sign.sh "$(brew --prefix)/bin/pippin"` if you need it.
+    # Guarded twice (File.exist? for old tags + sign.sh's ad-hoc fallback) so the
+    # install never fails. See docs/gotchas/permissions.md (pippin-xzu, pippin-jt9).
     sign_script = buildpath/"scripts/sign.sh"
     system "bash", sign_script, buildpath/".build/release/pippin" if File.exist?(sign_script)
     bin.install buildpath/".build/release/pippin"
