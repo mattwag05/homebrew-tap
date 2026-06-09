@@ -4,9 +4,17 @@ class Pippin < Formula
   # Stable installs use the PRE-SIGNED release tarball (Developer ID, signed at
   # release time by `make tarball`), NOT a from-source build. Homebrew's build
   # sandbox has no login-keychain access, so it cannot Developer-ID-sign — a
-  # source build would land ad-hoc and macOS TCC would drop its permission grants
-  # on every upgrade. Installing the pre-signed binary gives a stable code
-  # identity so grants persist. (pippin-jt9)
+  # source build would land ad-hoc. The pre-signed binary gives a stable code
+  # identity (Gatekeeper + a deterministic TCC client). (pippin-jt9)
+  #
+  # NOTE (pippin-6sf, corrects the earlier "grants persist" claim): macOS keys a
+  # bare-CLI TCC grant on the binary's RESOLVED PATH, and this formula's bin is a
+  # symlink into the VERSIONED Cellar path — so brew TCC grants are re-prompted on
+  # every `brew upgrade`. Signing only gives cdhash-independent persistence at a
+  # STABLE path. For durable Reminders/Calendar/Mail access (agents, scheduled
+  # tasks), use `~/.local/bin/pippin` (stable copied path via `make install`).
+  # pippin v0.31.0+ also re-execs disclaimed so the grant keys on its own identity
+  # regardless of launcher (pippin-0vr).
   url "https://github.com/mattwag05/pippin/releases/download/v0.31.0/pippin-0.31.0-arm64-macos.tar.gz"
   version "0.31.0"
   sha256 "c4ad7b9e6538d52fa806d849d650ea337359efb529695cb5a717d67ac3130485"
@@ -57,8 +65,10 @@ class Pippin < Formula
 
   test do
     assert_match version.to_s, shell_output("#{bin}/pippin --version")
-    # The published binary must carry a stable (non-ad-hoc) signature so TCC
-    # grants persist — the whole point of shipping a pre-signed asset.
+    # The published binary must carry a stable (non-ad-hoc) Developer ID
+    # signature — required for a deterministic TCC client identity + Gatekeeper.
+    # (Grant persistence across upgrades needs a stable PATH, not just signing —
+    # see the header note / pippin-6sf.)
     assert_match "Developer ID Application",
                  shell_output("/usr/bin/codesign -dvv #{bin}/pippin 2>&1")
   end
