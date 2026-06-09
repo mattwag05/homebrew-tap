@@ -7,9 +7,9 @@ class Pippin < Formula
   # source build would land ad-hoc and macOS TCC would drop its permission grants
   # on every upgrade. Installing the pre-signed binary gives a stable code
   # identity so grants persist. (pippin-jt9)
-  url "https://github.com/mattwag05/pippin/releases/download/v0.29.0/pippin-0.29.0-arm64-macos.tar.gz"
-  version "0.29.0"
-  sha256 "c5098b38a2a614d853d4a8fcf1ba30528b510db3017d7a2136f3c26909e143e6"
+  url "https://github.com/mattwag05/pippin/releases/download/v0.30.0/pippin-0.30.0-arm64-macos.tar.gz"
+  version "0.30.0"
+  sha256 "b49f2816bd62b8d4c8aa5af30e8f7d776e8ab26e2adbc2012b81a9ad6a0fdc0d"
   license "Apache-2.0"
 
   # `--HEAD` builds from source (for development). That path is ad-hoc/best-effort
