@@ -2,8 +2,8 @@ class Pippin < Formula
   desc "macOS CLI toolkit for Apple app automation"
   homepage "https://github.com/mattwag05/pippin"
   url "https://github.com/mattwag05/pippin.git",
-      tag:      "v0.28.0",
-      revision: "63443972869e1c80ddb7c16a6630361f217373cd"
+      tag:      "v0.29.0",
+      revision: "c00e52327d135640887dc54b482f289b1e55fa8a"
   license "Apache-2.0"
   head "https://github.com/mattwag05/pippin.git", branch: "main"
 
@@ -18,6 +18,14 @@ class Pippin < Formula
            "--disable-sandbox",
            "-c", "release",
            "--scratch-path", buildpath/".build"
+    # Sign with a stable identity so macOS TCC permission grants persist across
+    # `brew upgrade` (SwiftPM ad-hoc signs → CDHash-based identity → grants reset
+    # every rebuild). Guarded twice: the `File.exist?` skips tags older than the
+    # script, and scripts/sign.sh itself no-ops with an ad-hoc fallback when no
+    # Developer ID identity is in the keychain — so installs of any tag and on
+    # any machine still succeed. See docs/gotchas/permissions.md (pippin-xzu).
+    sign_script = buildpath/"scripts/sign.sh"
+    system "bash", sign_script, buildpath/".build/release/pippin" if File.exist?(sign_script)
     bin.install buildpath/".build/release/pippin"
   end
 
@@ -34,6 +42,6 @@ class Pippin < Formula
   end
 
   test do
-    assert_match "0.28.0", shell_output("#{bin}/pippin --version")
+    assert_match "0.29.0", shell_output("#{bin}/pippin --version")
   end
 end
