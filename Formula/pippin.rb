@@ -1,41 +1,53 @@
 class Pippin < Formula
   desc "macOS CLI toolkit for Apple app automation"
   homepage "https://github.com/mattwag05/pippin"
-  url "https://github.com/mattwag05/pippin.git",
-      tag:      "v0.29.0",
-      revision: "c00e52327d135640887dc54b482f289b1e55fa8a"
+  # Stable installs use the PRE-SIGNED release tarball (Developer ID, signed at
+  # release time by `make tarball`), NOT a from-source build. Homebrew's build
+  # sandbox has no login-keychain access, so it cannot Developer-ID-sign — a
+  # source build would land ad-hoc and macOS TCC would drop its permission grants
+  # on every upgrade. Installing the pre-signed binary gives a stable code
+  # identity so grants persist. (pippin-jt9)
+  url "https://github.com/mattwag05/pippin/releases/download/v0.29.0/pippin-0.29.0-arm64-macos.tar.gz"
+  version "0.29.0"
+  sha256 "c5098b38a2a614d853d4a8fcf1ba30528b510db3017d7a2136f3c26909e143e6"
   license "Apache-2.0"
-  head "https://github.com/mattwag05/pippin.git", branch: "main"
+
+  # `--HEAD` builds from source (for development). That path is ad-hoc/best-effort
+  # signed (the sandbox keychain limitation above), so `brew install --HEAD`
+  # binaries won't have persistent TCC grants — use a tagged release for that.
+  head do
+    url "https://github.com/mattwag05/pippin.git", branch: "main"
+    depends_on xcode: ["16.0", :build]
+  end
 
   # Pinned alongside AudioBridge.pinnedMLXAudioVersion — keep in sync.
-  MLX_AUDIO_PINNED = "0.4.2"
+  MLX_AUDIO_PINNED = "0.4.2".freeze
 
-  depends_on xcode: ["16.0", :build]
+  depends_on arch: :arm64
   depends_on :macos
 
   def install
-    system "swift", "build",
-           "--disable-sandbox",
-           "-c", "release",
-           "--scratch-path", buildpath/".build"
-    # Best-effort stable-identity signing so macOS TCC grants persist. NOTE:
-    # Homebrew's build sandbox has no login-keychain access, so sign.sh usually
-    # finds no Developer ID identity and falls back to ad-hoc here — brew-built
-    # pippin is typically ad-hoc, and `~/.local/bin/pippin` (from `make install`)
-    # is the signed path that shadows it on PATH. Re-sign the brew copy with
-    # `bash scripts/sign.sh "$(brew --prefix)/bin/pippin"` if you need it.
-    # Guarded twice (File.exist? for old tags + sign.sh's ad-hoc fallback) so the
-    # install never fails. See docs/gotchas/permissions.md (pippin-xzu, pippin-jt9).
-    sign_script = buildpath/"scripts/sign.sh"
-    system "bash", sign_script, buildpath/".build/release/pippin" if File.exist?(sign_script)
-    bin.install buildpath/".build/release/pippin"
+    if build.head?
+      system "swift", "build",
+             "--disable-sandbox",
+             "-c", "release",
+             "--scratch-path", buildpath/".build"
+      sign_script = buildpath/"scripts/sign.sh"
+      system "bash", sign_script, buildpath/".build/release/pippin" if File.exist?(sign_script)
+      bin.install buildpath/".build/release/pippin"
+    else
+      bin.install "pippin-#{version}-arm64-macos" => "pippin"
+    end
+    # Belt-and-suspenders: brew downloads aren't quarantined, but strip the attr
+    # if present so the signed binary never trips Gatekeeper on first run.
+    quiet_system "/usr/bin/xattr", "-d", "com.apple.quarantine", bin/"pippin"
   end
 
   def post_install
     pipx = which("pipx")
     if pipx.nil?
       ohai "pipx not found — skipping mlx-audio install."
-      ohai "For \`pippin memos transcribe\`, run:"
+      ohai "For `pippin memos transcribe`, run:"
       ohai "  brew install pipx && pipx install 'mlx-audio==#{MLX_AUDIO_PINNED}'"
       return
     end
@@ -44,6 +56,10 @@ class Pippin < Formula
   end
 
   test do
-    assert_match "0.29.0", shell_output("#{bin}/pippin --version")
+    assert_match version.to_s, shell_output("#{bin}/pippin --version")
+    # The published binary must carry a stable (non-ad-hoc) signature so TCC
+    # grants persist — the whole point of shipping a pre-signed asset.
+    assert_match "Developer ID Application",
+                 shell_output("/usr/bin/codesign -dvv #{bin}/pippin 2>&1")
   end
 end
