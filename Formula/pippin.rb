@@ -15,9 +15,9 @@ class Pippin < Formula
   # tasks), use `~/.local/bin/pippin` (stable copied path via `make install`).
   # pippin v0.31.0+ also re-execs disclaimed so the grant keys on its own identity
   # regardless of launcher (pippin-0vr).
-  url "https://github.com/mattwag05/pippin/releases/download/v0.32.1/pippin-0.32.1-arm64-macos.tar.gz"
-  version "0.32.1"
-  sha256 "6d17ea88282f223cfeffdcd172ae0fb9125fa8260dd81e2493f5edf32e44a930"
+  url "https://github.com/mattwag05/pippin/releases/download/v0.33.0/pippin-0.33.0-arm64-macos.tar.gz"
+  version "0.33.0"
+  sha256 "e7a385d65f5141e14d787ffbd988ec8a79a7c24f184497573f00198b3cb585f3"
   license "Apache-2.0"
 
   # `--HEAD` builds from source (for development). That path is ad-hoc/best-effort
